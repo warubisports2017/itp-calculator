@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ITP Investment Calculator</title>
+<style>
+  /* Reset & scope everything under #itp-calculator */
+  #itp-calculator {
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 32px 20px;
+    color: #1a1a1a;
+    background: #fff;
+    line-height: 1.6;
+    box-sizing: border-box;
+  }
+  #itp-calculator *, #itp-calculator *::before, #itp-calculator *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Header */
+  #itp-calculator .calc-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  #itp-calculator .calc-header h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 6px;
+  }
+  #itp-calculator .calc-header p {
+    font-size: 15px;
+    color: #6b7280;
+    margin-bottom: 16px;
+  }
+  #itp-calculator .accent-line {
+    width: 60px;
+    height: 3px;
+    background: #ED1C24;
+    margin: 0 auto;
+    border-radius: 2px;
+  }
+
+  /* Duration Tabs */
+  #itp-calculator .duration-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  #itp-calculator .duration-tab {
+    flex: 1;
+    padding: 16px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #fff;
+  }
+  #itp-calculator .duration-tab:hover {
+    border-color: #cbd5e1;
+    background: #fafafa;
+  }
+  #itp-calculator .duration-tab.active {
+    border-left: 3px solid #ED1C24;
+    background: #fef2f2;
+    border-color: #fecaca;
+  }
+  #itp-calculator .duration-tab .tab-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+  }
+  #itp-calculator .duration-tab .tab-price {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+  #itp-calculator .duration-tab .tab-monthly {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 2px;
+  }
+  #itp-calculator .duration-tab.active .tab-label {
+    color: #ED1C24;
+  }
+
+  /* Breakdown Section */
+  #itp-calculator .breakdown-section {
+    margin-bottom: 32px;
+  }
+  #itp-calculator .breakdown-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #2563EB;
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0;
+    font-family: inherit;
+  }
+  #itp-calculator .breakdown-toggle:hover {
+    text-decoration: underline;
+  }
+  #itp-calculator .breakdown-toggle .arrow {
+    display: inline-block;
+    transition: transform 0.2s ease;
+    font-size: 12px;
+  }
+  #itp-calculator .breakdown-toggle .arrow.open {
+    transform: rotate(90deg);
+  }
+  #itp-calculator .breakdown-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 14px;
+  }
+  #itp-calculator .breakdown-table th {
+    text-align: left;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border-bottom: 2px solid #e2e8f0;
+    font-weight: 600;
+    color: #374151;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  #itp-calculator .breakdown-table th:nth-child(2) {
+    text-align: right;
+    width: 120px;
+  }
+  #itp-calculator .breakdown-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #374151;
+  }
+  #itp-calculator .breakdown-table td:nth-child(2) {
+    text-align: right;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  #itp-calculator .breakdown-table td:nth-child(3) {
+    color: #6b7280;
+    font-size: 13px;
+  }
+  #itp-calculator .breakdown-table tr.total-row td {
+    border-bottom: 2px solid #e2e8f0;
+    border-top: 2px solid #e2e8f0;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+  #itp-calculator .breakdown-extras {
+    font-size: 13px;
+    color: #059669;
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: #f0fdf4;
+    border-radius: 6px;
+    border-left: 3px solid #059669;
+  }
+  #itp-calculator .breakdown-excluded {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 8px;
+    padding: 8px 14px;
+    background: #f8fafc;
+    border-radius: 6px;
+    border-left: 3px solid #e2e8f0;
+  }
+  #itp-calculator .breakdown-adjusted {
+    font-size: 14px;
+    color: #6b7280;
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border-left: 3px solid #e2e8f0;
+  }
+
+  /* Comparison Section */
+  #itp-calculator .comparison-section {
+    margin-bottom: 32px;
+  }
+  #itp-calculator .comparison-section h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 16px;
+  }
+  #itp-calculator .comparison-select-wrap {
+    margin-bottom: 20px;
+  }
+  #itp-calculator .comparison-select-wrap label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+    display: block;
+    margin-bottom: 6px;
+  }
+  #itp-calculator .comparison-select-wrap select {
+    width: 100%;
+    max-width: 340px;
+    padding: 10px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #374151;
+    background: #fff;
+    cursor: pointer;
+    appearance: auto;
+  }
+
+  /* Side-by-side cards */
+  #itp-calculator .comparison-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  #itp-calculator .comp-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  #itp-calculator .comp-card-header {
+    padding: 16px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  #itp-calculator .comp-card.itp .comp-card-header {
+    border-top: 3px solid #ED1C24;
+  }
+  #itp-calculator .comp-card.us .comp-card-header {
+    border-top: 3px solid #9ca3af;
+  }
+  #itp-calculator .comp-card-header .card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 4px;
+  }
+  #itp-calculator .comp-card-header .card-price {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+  #itp-calculator .comp-card-header .card-period {
+    font-size: 12px;
+    color: #9ca3af;
+    font-weight: 400;
+  }
+  #itp-calculator .comp-card-body {
+    padding: 12px 16px 16px;
+  }
+  #itp-calculator .comp-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 14px;
+    border-bottom: 1px solid #f8fafc;
+  }
+  #itp-calculator .comp-line:last-child {
+    border-bottom: none;
+  }
+  #itp-calculator .comp-line .line-label {
+    color: #374151;
+  }
+  #itp-calculator .comp-line .line-value {
+    font-weight: 600;
+    color: #374151;
+    font-variant-numeric: tabular-nums;
+  }
+  #itp-calculator .comp-line .line-value.included {
+    color: #059669;
+  }
+  #itp-calculator .comp-line .line-value.extra {
+    color: #9ca3af;
+    font-style: italic;
+    font-weight: 400;
+  }
+  #itp-calculator .comp-line .line-value.dash {
+    color: #d1d5db;
+  }
+
+  /* Editable comparison inputs */
+  #itp-calculator .comp-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  #itp-calculator .comp-input-prefix {
+    font-weight: 600;
+    color: #374151;
+    font-size: 14px;
+  }
+  #itp-calculator .comp-input {
+    width: 72px;
+    text-align: right;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    color: #374151;
+    border: none;
+    border-bottom: 1px dashed #cbd5e1;
+    background: transparent;
+    padding: 2px 0;
+    font-variant-numeric: tabular-nums;
+    -moz-appearance: textfield;
+  }
+  #itp-calculator .comp-input::-webkit-outer-spin-button,
+  #itp-calculator .comp-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  #itp-calculator .comp-input:focus {
+    outline: none;
+    border-bottom-color: #2563EB;
+    border-bottom-style: solid;
+  }
+  #itp-calculator .comp-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0 4px;
+    margin-top: 4px;
+    border-top: 2px solid #e2e8f0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+  #itp-calculator .comparison-nudge {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border-left: 3px solid #e2e8f0;
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.5;
+  }
+
+  /* ASU Credits Callout */
+  #itp-calculator .credits-callout {
+    margin-bottom: 32px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  #itp-calculator .credits-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 16px;
+    background: #f8fafc;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+  }
+  #itp-calculator .credits-toggle:hover {
+    background: #f1f5f9;
+  }
+  #itp-calculator .credits-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #dbeafe;
+    color: #2563EB;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+  #itp-calculator .credits-toggle-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+    flex: 1;
+  }
+  #itp-calculator .credits-toggle .arrow {
+    display: inline-block;
+    transition: transform 0.2s ease;
+    font-size: 12px;
+    color: #9ca3af;
+    flex-shrink: 0;
+  }
+  #itp-calculator .credits-toggle .arrow.open {
+    transform: rotate(90deg);
+  }
+  #itp-calculator .credits-body {
+    padding: 16px;
+    display: none;
+    border-top: 1px solid #e2e8f0;
+  }
+  #itp-calculator .credits-body p {
+    font-size: 14px;
+    color: #374151;
+    margin-bottom: 12px;
+  }
+  #itp-calculator .credits-body p:last-child {
+    margin-bottom: 0;
+  }
+  #itp-calculator .credits-highlights {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  #itp-calculator .credits-highlight {
+    flex: 1;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 6px;
+    text-align: center;
+  }
+  #itp-calculator .credits-highlight .ch-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2563EB;
+    display: block;
+  }
+  #itp-calculator .credits-highlight .ch-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 2px;
+    display: block;
+  }
+  #itp-calculator .credits-fine {
+    font-size: 12px !important;
+    color: #9ca3af !important;
+    font-style: italic;
+  }
+
+  /* Reservation Fee */
+  #itp-calculator .reservation-fee {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+  #itp-calculator .rf-step {
+    background: #ED1C24;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  #itp-calculator .rf-content {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  #itp-calculator .rf-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+  }
+  #itp-calculator .rf-amount {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+  #itp-calculator .rf-detail {
+    font-size: 13px;
+    color: #6b7280;
+    flex-basis: 100%;
+  }
+  #itp-calculator .remaining-label {
+    font-size: 14px;
+    color: #374151;
+    margin-bottom: 14px;
+  }
+
+  /* Financing Section */
+  #itp-calculator .financing-section {
+    margin-bottom: 32px;
+  }
+  #itp-calculator .financing-section h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 6px;
+  }
+  #itp-calculator .financing-section .financing-subtitle {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 16px;
+  }
+  #itp-calculator .payment-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  #itp-calculator .payment-option {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 20px 16px;
+    text-align: center;
+    position: relative;
+  }
+  #itp-calculator .payment-option.highlight {
+    border-color: #2563EB;
+    box-shadow: 0 0 0 1px #2563EB;
+  }
+  #itp-calculator .po-popular {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2563EB;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  #itp-calculator .po-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  #itp-calculator .po-amount {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+  }
+  #itp-calculator .po-detail {
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.4;
+  }
+  #itp-calculator .financing-note {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 14px;
+    text-align: center;
+  }
+
+  /* Funding Tips Section */
+  #itp-calculator .funding-section {
+    margin-bottom: 32px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  #itp-calculator .funding-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 16px;
+    background: #f8fafc;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+  }
+  #itp-calculator .funding-toggle:hover {
+    background: #f1f5f9;
+  }
+  #itp-calculator .funding-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #dcfce7;
+    color: #16a34a;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+  #itp-calculator .funding-toggle-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+    flex: 1;
+  }
+  #itp-calculator .funding-toggle .arrow {
+    display: inline-block;
+    transition: transform 0.2s ease;
+    font-size: 12px;
+    color: #9ca3af;
+    flex-shrink: 0;
+  }
+  #itp-calculator .funding-toggle .arrow.open {
+    transform: rotate(90deg);
+  }
+  #itp-calculator .funding-body {
+    padding: 16px;
+    display: none;
+    border-top: 1px solid #e2e8f0;
+  }
+  #itp-calculator .funding-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  #itp-calculator .funding-card {
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #f1f5f9;
+  }
+  #itp-calculator .funding-card-icon {
+    font-size: 22px;
+    margin-bottom: 8px;
+    display: block;
+  }
+  #itp-calculator .funding-card h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 6px;
+  }
+  #itp-calculator .funding-card p {
+    font-size: 13px;
+    color: #374151;
+    line-height: 1.5;
+  }
+  #itp-calculator .funding-disclaimer {
+    font-size: 12px;
+    color: #9ca3af;
+    font-style: italic;
+  }
+
+  /* Footer */
+  #itp-calculator .calc-footer {
+    text-align: center;
+    padding-top: 24px;
+    border-top: 1px solid #e2e8f0;
+  }
+  #itp-calculator .calc-footer .source-note {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-bottom: 16px;
+  }
+  #itp-calculator .calc-footer .cta-text {
+    font-size: 15px;
+    color: #374151;
+    margin-bottom: 4px;
+  }
+  #itp-calculator .calc-footer .cta-subtext {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 12px;
+  }
+  #itp-calculator .calc-footer .cta-btn {
+    display: inline-block;
+    padding: 10px 28px;
+    background: #ED1C24;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.2s ease;
+  }
+  #itp-calculator .calc-footer .cta-btn:hover {
+    background: #dc1b22;
+  }
+  #itp-calculator .calc-footer .payment-note {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 16px;
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    #itp-calculator {
+      padding: 24px 16px;
+    }
+    #itp-calculator .duration-tabs {
+      flex-direction: column;
+      gap: 8px;
+    }
+    #itp-calculator .duration-tab {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-align: left;
+      padding: 12px 16px;
+    }
+    #itp-calculator .duration-tab .tab-label {
+      margin-bottom: 0;
+    }
+    #itp-calculator .duration-tab .tab-price {
+      font-size: 18px;
+    }
+    #itp-calculator .duration-tab .tab-monthly {
+      display: none;
+    }
+    #itp-calculator .comparison-cards {
+      grid-template-columns: 1fr;
+    }
+    #itp-calculator .breakdown-table td:nth-child(3) {
+      display: none;
+    }
+    #itp-calculator .comp-card-header .card-price {
+      font-size: 20px;
+    }
+    #itp-calculator .payment-options {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    #itp-calculator .payment-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-align: left;
+      padding: 14px 16px;
+    }
+    #itp-calculator .po-popular {
+      top: auto;
+      left: auto;
+      right: 12px;
+      transform: none;
+      position: static;
+      margin-left: 8px;
+    }
+    #itp-calculator .po-amount {
+      font-size: 18px;
+      margin-bottom: 0;
+    }
+    #itp-calculator .po-label {
+      margin-bottom: 2px;
+    }
+    #itp-calculator .credits-highlights {
+      flex-direction: column;
+    }
+    #itp-calculator .funding-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="itp-calculator">
+  <!-- Header -->
+  <div class="calc-header">
+    <h2>ITP Investment Calculator</h2>
+    <p>See what's included and how it compares.</p>
+    <div class="accent-line"></div>
+  </div>
+
+  <!-- Duration Tabs -->
+  <div class="duration-tabs" id="durationTabs">
+    <div class="duration-tab" data-duration="3" onclick="selectDuration(3)">
+      <div class="tab-label">3 Months</div>
+      <div class="tab-price">16,000 EUR</div>
+      <div class="tab-monthly">5,333 / month</div>
+    </div>
+    <div class="duration-tab" data-duration="6" onclick="selectDuration(6)">
+      <div class="tab-label">6 Months</div>
+      <div class="tab-price">29,000 EUR</div>
+      <div class="tab-monthly">4,833 / month</div>
+    </div>
+    <div class="duration-tab active" data-duration="10" onclick="selectDuration(10)">
+      <div class="tab-label">Full Season</div>
+      <div class="tab-price">44,000 EUR</div>
+      <div class="tab-monthly">4,400 / month</div>
+    </div>
+  </div>
+
+  <!-- What's Included Breakdown -->
+  <div class="breakdown-section" id="breakdownSection">
+    <div id="breakdownFull">
+      <button class="breakdown-toggle" onclick="toggleBreakdown()">
+        <span class="arrow" id="breakdownArrow">&#9654;</span>
+        What's included in the Full Season?
+      </button>
+      <div id="breakdownContent" style="display:none;">
+        <table class="breakdown-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Amount</th>
+              <th>Includes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Athletic &amp; Academic Fees</td>
+              <td>24,700 EUR</td>
+              <td>Bundesliga club registration, UEFA licensed coaching, 5x/week team training, video analysis, 2–4 games/month, game &amp; showcase travel, league registration, full training &amp; game day kit, language school (2–3x/week), performance reports, sports medicine access</td>
+            </tr>
+            <tr>
+              <td>Accommodation</td>
+              <td>8,000 EUR</td>
+              <td>Furnished apartment, all utilities, gym/pool/wellness facilities</td>
+            </tr>
+            <tr>
+              <td>Meal Plan</td>
+              <td>4,800 EUR</td>
+              <td>3 meals/day, team dining</td>
+            </tr>
+            <tr>
+              <td>Insurance</td>
+              <td>1,500 EUR</td>
+              <td>Health, accident &amp; liability coverage</td>
+            </tr>
+            <tr>
+              <td>International Fees</td>
+              <td>5,000 EUR</td>
+              <td>Visa support, public transport pass, orientation, admin &amp; support staff</td>
+            </tr>
+            <tr class="total-row">
+              <td>Total</td>
+              <td>44,000 EUR</td>
+              <td>All-inclusive for 10 months</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="breakdown-extras">Also included: stadium tour, tickets for selected Bundesliga home games, visits to first team training sessions.</p>
+        <p class="breakdown-excluded">Not included: travel to and from Germany.</p>
+      </div>
+    </div>
+    <div id="breakdownShort" style="display:none;">
+      <p class="breakdown-adjusted">Same services — pro training, accommodation, meals, insurance, and international support — at an adjusted rate.</p>
+    </div>
+  </div>
+
+  <!-- Comparison -->
+  <div class="comparison-section">
+    <h3>How Does It Compare?</h3>
+
+    <div class="comparison-select-wrap">
+      <label for="usComparison">Compare ITP to:</label>
+      <select id="usComparison" onchange="updateComparison()">
+        <option value="private">Private University — $58,000/yr</option>
+        <option value="out_of_state">Public University (Out-of-State) — $45,000/yr</option>
+        <option value="in_state">Public University (In-State) — $27,000/yr</option>
+        <option value="prep">US Prep Soccer Academy — $40,000/yr</option>
+      </select>
+    </div>
+
+    <div class="comparison-cards" id="comparisonCards"></div>
+    <div class="comparison-nudge" id="comparisonNudge"></div>
+  </div>
+
+  <!-- ASU Online Credits (Optional) -->
+  <div class="credits-callout" id="creditsCallout">
+    <button class="credits-toggle" onclick="toggleCredits()">
+      <span class="credits-badge">Optional</span>
+      <span class="credits-toggle-text">Earn US College Credits While You Train</span>
+      <span class="arrow" id="creditsArrow">&#9654;</span>
+    </button>
+    <div class="credits-body" id="creditsBody">
+      <p>Players train with FC K&ouml;ln while earning transferable US college credits through Arizona State University &mdash; ASU. This integrated pathway allows players to advance their football development and academic degree simultaneously during their time in Germany.</p>
+      <div class="credits-highlights">
+        <div class="credits-highlight">
+          <span class="ch-value">12–30</span>
+          <span class="ch-label">credits per year</span>
+        </div>
+        <div class="credits-highlight">
+          <span class="ch-value">100%</span>
+          <span class="ch-label">online, flexible schedule</span>
+        </div>
+        <div class="credits-highlight">
+          <span class="ch-value">Transferable</span>
+          <span class="ch-label">to US colleges &amp; universities</span>
+        </div>
+      </div>
+      <p>Credits transfer to most US institutions, enabling athletes to complete the equivalent of a US university year while training in Cologne &mdash; often reducing future tuition costs and time to graduation.</p>
+      <p class="credits-fine">ASU Online enrollment is arranged separately. Credit load is flexible and tailored to each player's academic level and schedule.</p>
+    </div>
+  </div>
+
+  <!-- Financing Options -->
+  <div class="financing-section" id="financingSection">
+    <h3>Flexible Payment Options</h3>
+    <p class="financing-subtitle">Choose what works best for your family.</p>
+
+    <div class="reservation-fee">
+      <div class="rf-step">Step 1</div>
+      <div class="rf-content">
+        <div class="rf-label">Reservation Fee</div>
+        <div class="rf-amount">5,000 EUR</div>
+        <div class="rf-detail">Due upon commitment to secure your spot</div>
+      </div>
+    </div>
+
+    <div class="remaining-label">Then choose how to pay the remaining <strong id="remainingAmount">39,000 EUR</strong>:</div>
+
+    <div class="payment-options" id="paymentOptions">
+      <div class="payment-option">
+        <div>
+          <div class="po-label">2 Installments</div>
+          <div class="po-amount" id="poTwo">19,500 EUR</div>
+          <div class="po-detail" id="poTwoDetail">&times;2 payments — at start &amp; midway</div>
+        </div>
+      </div>
+      <div class="payment-option">
+        <div>
+          <div class="po-label">Monthly Plan</div>
+          <div class="po-amount" id="poMonthly">3,900 EUR</div>
+          <div class="po-detail" id="poMonthlyDetail">&times;10 months — spread across program</div>
+        </div>
+      </div>
+      <div class="payment-option" id="poExtendedCard" style="display:none;">
+        <div>
+          <div class="po-label">Extended Plan</div>
+          <div class="po-amount" id="poExtended">1,625 EUR</div>
+          <div class="po-detail" id="poExtendedDetail">&times;24 months — payments continue after program</div>
+        </div>
+      </div>
+    </div>
+    <p class="financing-note" id="financingNote">All options cover the same services. Contact us to discuss which plan fits your situation.</p>
+  </div>
+
+  <!-- Smart Ways to Fund -->
+  <div class="funding-section" id="fundingSection">
+    <button class="funding-toggle" onclick="toggleFunding()">
+      <span class="funding-badge">Note</span>
+      <span class="funding-toggle-text">Additional Options for US Families</span>
+      <span class="arrow" id="fundingArrow">&#9654;</span>
+    </button>
+    <div class="funding-body" id="fundingBody">
+      <div class="funding-cards">
+        <div class="funding-card">
+          <span class="funding-card-icon">&#127891;</span>
+          <h4>Use 529 Education Savings</h4>
+          <p>If your athlete enrolls in ASU Online courses alongside the ITP, that tuition can be paid from your 529 plan tax-free. ASU is a federally recognized institution (school code: 001081).</p>
+        </div>
+        <div class="funding-card">
+          <span class="funding-card-icon">&#128176;</span>
+          <h4>Claim Education Tax Credits</h4>
+          <p>ASU Online enrollment may qualify for the American Opportunity Tax Credit (up to $2,500/year) or the Lifetime Learning Credit (up to $2,000/year). These credits directly reduce your tax bill.</p>
+        </div>
+      </div>
+      <p class="funding-disclaimer">Tax benefits depend on individual circumstances. Consult a qualified tax advisor.</p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="calc-footer">
+    <p class="source-note">ITP costs in EUR. US costs in USD (College Board 2025–26).</p>
+    <p class="cta-text">Have questions about pricing or payment plans?</p>
+    <p class="cta-subtext">We're happy to walk you through the details.</p>
+    <a href="https://warubi-sports.com/contact" class="cta-btn">Contact Us &#8594;</a>
+  </div>
+</div>
+
+<script>
+(function() {
+  var durations = {
+    3:  { label: '3 Months', eur: 16000, months: '3 months', installments: 2, monthlySpan: 3 },
+    6:  { label: '6 Months', eur: 29000, months: '6 months', installments: 2, monthlySpan: 6 },
+    10: { label: 'Full Season', eur: 44000, months: '10 months', installments: 2, monthlySpan: 10 }
+  };
+
+  var usPresets = {
+    private: {
+      label: 'US Private University',
+      editable: [
+        { key: 'tuition', label: 'Tuition', value: 42000 },
+        { key: 'room', label: 'Room & Board', value: 14000 },
+        { key: 'fees', label: 'Fees', value: 2000 },
+        { key: 'insurance', label: 'Insurance', value: 0 }
+      ],
+      static: [
+        { label: 'Language Training', type: 'dash' },
+        { label: 'Equipment/Gear', type: 'extra' },
+        { label: 'Int\'l Support', type: 'dash' }
+      ]
+    },
+    out_of_state: {
+      label: 'Public Univ. (Out-of-State)',
+      editable: [
+        { key: 'tuition', label: 'Tuition', value: 25000 },
+        { key: 'room', label: 'Room & Board', value: 13000 },
+        { key: 'fees', label: 'Fees', value: 3000 },
+        { key: 'insurance', label: 'Insurance', value: 2500 }
+      ],
+      static: [
+        { label: 'Language Training', type: 'dash' },
+        { label: 'Equipment/Gear', type: 'extra' },
+        { label: 'Int\'l Support', type: 'value', value: 1500 }
+      ]
+    },
+    in_state: {
+      label: 'Public Univ. (In-State)',
+      editable: [
+        { key: 'tuition', label: 'Tuition', value: 10000 },
+        { key: 'room', label: 'Room & Board', value: 12000 },
+        { key: 'fees', label: 'Fees', value: 2000 },
+        { key: 'insurance', label: 'Insurance', value: 2000 }
+      ],
+      static: [
+        { label: 'Language Training', type: 'dash' },
+        { label: 'Equipment/Gear', type: 'extra' },
+        { label: 'Int\'l Support', type: 'value', value: 1000 }
+      ]
+    },
+    prep: {
+      label: 'US Prep Soccer Academy',
+      editable: [
+        { key: 'tuition', label: 'Tuition & Training', value: 22000 },
+        { key: 'room', label: 'Room & Board', value: 12000 },
+        { key: 'fees', label: 'Fees', value: 2000 },
+        { key: 'insurance', label: 'Insurance', value: 0 }
+      ],
+      static: [
+        { label: 'Language Training', type: 'dash' },
+        { label: 'Equipment/Gear', type: 'value', value: 2000 },
+        { label: 'Int\'l Support', type: 'value', value: 2000 }
+      ]
+    }
+  };
+
+  var itpLineLabels = [
+    'Tuition & Training',
+    'Housing',
+    'Meals',
+    'Language School',
+    'Insurance',
+    'Kit & Gear',
+    'Int\'l Fees & Support'
+  ];
+
+  var currentDuration = 10;
+  var currentPreset = 'private';
+  var currentUSValues = {};
+
+  function initUSValues(presetKey) {
+    currentPreset = presetKey;
+    currentUSValues = {};
+    var preset = usPresets[presetKey];
+    for (var i = 0; i < preset.editable.length; i++) {
+      currentUSValues[preset.editable[i].key] = preset.editable[i].value;
+    }
+  }
+
+  function formatEUR(n) {
+    return n.toLocaleString('en-US') + ' EUR';
+  }
+
+  function formatUSD(n) {
+    return '$' + n.toLocaleString('en-US');
+  }
+
+  function getUSTotal() {
+    var sum = 0;
+    for (var key in currentUSValues) {
+      sum += currentUSValues[key] || 0;
+    }
+    var preset = usPresets[currentPreset];
+    for (var i = 0; i < preset.static.length; i++) {
+      if (preset.static[i].type === 'value') {
+        sum += preset.static[i].value;
+      }
+    }
+    return sum;
+  }
+
+  function recalcUSTotal() {
+    var inputs = document.querySelectorAll('.comp-input');
+    for (var i = 0; i < inputs.length; i++) {
+      var key = inputs[i].getAttribute('data-key');
+      currentUSValues[key] = parseInt(inputs[i].value) || 0;
+    }
+    var total = getUSTotal();
+    var headerEl = document.getElementById('usCardPrice');
+    if (headerEl) headerEl.textContent = formatUSD(total);
+    var totalEl = document.getElementById('usCardTotal');
+    if (totalEl) totalEl.textContent = formatUSD(total);
+    updateNudge(total);
+  }
+
+  function updateNudge(usTotal) {
+    var dur = durations[currentDuration];
+    var nudge = document.getElementById('comparisonNudge');
+    if (!nudge) return;
+    nudge.textContent = dur.eur.toLocaleString('en-US') + ' EUR vs ' + formatUSD(usTotal) + ' \u2014 ITP includes professional training, housing, meals, and more.';
+  }
+
+  function buildCards() {
+    var preset = usPresets[currentPreset];
+    var dur = durations[currentDuration];
+    var container = document.getElementById('comparisonCards');
+
+    while (container.firstChild) container.removeChild(container.firstChild);
+
+    // --- ITP Card ---
+    var itpCard = document.createElement('div');
+    itpCard.className = 'comp-card itp';
+
+    var itpHeader = document.createElement('div');
+    itpHeader.className = 'comp-card-header';
+
+    var itpTitle = document.createElement('div');
+    itpTitle.className = 'card-title';
+    itpTitle.textContent = 'ITP ' + dur.label;
+
+    var itpPrice = document.createElement('div');
+    itpPrice.className = 'card-price';
+    itpPrice.textContent = formatEUR(dur.eur);
+
+    var itpPeriod = document.createElement('div');
+    itpPeriod.className = 'card-period';
+    itpPeriod.textContent = dur.months + ', all-inclusive';
+
+    itpHeader.appendChild(itpTitle);
+    itpHeader.appendChild(itpPrice);
+    itpHeader.appendChild(itpPeriod);
+    itpCard.appendChild(itpHeader);
+
+    var itpBody = document.createElement('div');
+    itpBody.className = 'comp-card-body';
+
+    for (var i = 0; i < itpLineLabels.length; i++) {
+      var row = document.createElement('div');
+      row.className = 'comp-line';
+
+      var lbl = document.createElement('span');
+      lbl.className = 'line-label';
+      lbl.textContent = itpLineLabels[i];
+
+      var val = document.createElement('span');
+      val.className = 'line-value included';
+      val.textContent = '\u2713 Included';
+
+      row.appendChild(lbl);
+      row.appendChild(val);
+      itpBody.appendChild(row);
+    }
+
+    itpCard.appendChild(itpBody);
+
+    // --- US Card ---
+    var usCard = document.createElement('div');
+    usCard.className = 'comp-card us';
+
+    var usHeader = document.createElement('div');
+    usHeader.className = 'comp-card-header';
+
+    var usTitle = document.createElement('div');
+    usTitle.className = 'card-title';
+    usTitle.textContent = preset.label;
+
+    var usPrice = document.createElement('div');
+    usPrice.className = 'card-price';
+    usPrice.id = 'usCardPrice';
+    usPrice.textContent = formatUSD(getUSTotal());
+
+    var usPeriod = document.createElement('div');
+    usPeriod.className = 'card-period';
+    usPeriod.textContent = 'per year';
+
+    usHeader.appendChild(usTitle);
+    usHeader.appendChild(usPrice);
+    usHeader.appendChild(usPeriod);
+    usCard.appendChild(usHeader);
+
+    var usBody = document.createElement('div');
+    usBody.className = 'comp-card-body';
+
+    // Editable lines with inputs
+    for (var j = 0; j < preset.editable.length; j++) {
+      var item = preset.editable[j];
+      var uRow = document.createElement('div');
+      uRow.className = 'comp-line';
+
+      var uLbl = document.createElement('span');
+      uLbl.className = 'line-label';
+      uLbl.textContent = item.label;
+
+      var wrap = document.createElement('div');
+      wrap.className = 'comp-input-wrap';
+
+      var prefix = document.createElement('span');
+      prefix.className = 'comp-input-prefix';
+      prefix.textContent = '$';
+
+      var input = document.createElement('input');
+      input.type = 'number';
+      input.className = 'comp-input';
+      input.setAttribute('data-key', item.key);
+      input.min = '0';
+      input.step = '100';
+      var curVal = currentUSValues[item.key];
+      input.value = curVal ? curVal : '';
+      input.addEventListener('input', recalcUSTotal);
+
+      wrap.appendChild(prefix);
+      wrap.appendChild(input);
+      uRow.appendChild(uLbl);
+      uRow.appendChild(wrap);
+      usBody.appendChild(uRow);
+    }
+
+    // Static lines (non-editable)
+    for (var k = 0; k < preset.static.length; k++) {
+      var sItem = preset.static[k];
+      var sRow = document.createElement('div');
+      sRow.className = 'comp-line';
+
+      var sLbl = document.createElement('span');
+      sLbl.className = 'line-label';
+      sLbl.textContent = sItem.label;
+
+      var sVal = document.createElement('span');
+      if (sItem.type === 'dash') {
+        sVal.className = 'line-value dash';
+        sVal.textContent = '\u2014';
+      } else if (sItem.type === 'extra') {
+        sVal.className = 'line-value extra';
+        sVal.textContent = 'Extra';
+      } else if (sItem.type === 'value') {
+        sVal.className = 'line-value';
+        sVal.textContent = formatUSD(sItem.value);
+      }
+
+      sRow.appendChild(sLbl);
+      sRow.appendChild(sVal);
+      usBody.appendChild(sRow);
+    }
+
+    // Total row
+    var totalRow = document.createElement('div');
+    totalRow.className = 'comp-total-row';
+
+    var totalLbl = document.createElement('span');
+    totalLbl.className = 'line-label';
+    totalLbl.textContent = 'Total';
+
+    var totalVal = document.createElement('span');
+    totalVal.className = 'line-value';
+    totalVal.id = 'usCardTotal';
+    totalVal.textContent = formatUSD(getUSTotal());
+
+    totalRow.appendChild(totalLbl);
+    totalRow.appendChild(totalVal);
+    usBody.appendChild(totalRow);
+
+    usCard.appendChild(usBody);
+
+    container.appendChild(itpCard);
+    container.appendChild(usCard);
+
+    updateNudge(getUSTotal());
+  }
+
+  window.selectDuration = function(d) {
+    currentDuration = d;
+    var tabs = document.querySelectorAll('#durationTabs .duration-tab');
+    for (var i = 0; i < tabs.length; i++) {
+      var tab = tabs[i];
+      if (parseInt(tab.getAttribute('data-duration'), 10) === d) {
+        tab.classList.add('active');
+      } else {
+        tab.classList.remove('active');
+      }
+    }
+    var full = document.getElementById('breakdownFull');
+    var short = document.getElementById('breakdownShort');
+    if (d === 10) {
+      full.style.display = '';
+      short.style.display = 'none';
+    } else {
+      full.style.display = 'none';
+      short.style.display = '';
+    }
+    buildCards();
+    updateFinancing();
+  };
+
+  window.toggleBreakdown = function() {
+    var content = document.getElementById('breakdownContent');
+    var arrow = document.getElementById('breakdownArrow');
+    if (content.style.display === 'none') {
+      content.style.display = '';
+      arrow.classList.add('open');
+    } else {
+      content.style.display = 'none';
+      arrow.classList.remove('open');
+    }
+  };
+
+  window.toggleCredits = function() {
+    var body = document.getElementById('creditsBody');
+    var arrow = document.getElementById('creditsArrow');
+    if (body.style.display === 'none' || body.style.display === '') {
+      body.style.display = 'block';
+      arrow.classList.add('open');
+    } else {
+      body.style.display = 'none';
+      arrow.classList.remove('open');
+    }
+  };
+
+  window.toggleFunding = function() {
+    var body = document.getElementById('fundingBody');
+    var arrow = document.getElementById('fundingArrow');
+    if (body.style.display === 'none' || body.style.display === '') {
+      body.style.display = 'block';
+      arrow.classList.add('open');
+    } else {
+      body.style.display = 'none';
+      arrow.classList.remove('open');
+    }
+  };
+
+  var RESERVATION = 5000;
+
+  function updateFinancing() {
+    var dur = durations[currentDuration];
+    var remaining = dur.eur - RESERVATION;
+    var half = Math.round(remaining / 2);
+    var monthlyMonths = currentDuration === 10 ? 12 : currentDuration === 6 ? 8 : dur.monthlySpan;
+    var monthlyTotal = Math.round(remaining * 1.05);
+    var monthly = Math.round(monthlyTotal / monthlyMonths);
+    var extendedTotal = Math.round(remaining * 1.10);
+    var extendedMonths = currentDuration === 10 ? 18 : 12;
+    var extendedPerMonth = Math.round(extendedTotal / extendedMonths);
+
+    document.getElementById('remainingAmount').textContent = formatEUR(remaining);
+    document.getElementById('poTwo').textContent = formatEUR(half);
+    document.getElementById('poTwoDetail').textContent = '\u00d72 payments \u2014 at start & midway';
+    document.getElementById('poMonthly').textContent = formatEUR(monthly);
+    document.getElementById('poMonthlyDetail').textContent = '\u00d7' + monthlyMonths + ' months \u2014 ' + formatEUR(monthlyTotal) + ' total';
+
+    var extCard = document.getElementById('poExtendedCard');
+    var noteEl = document.getElementById('financingNote');
+    if (currentDuration >= 6) {
+      extCard.style.display = '';
+      document.getElementById('poExtended').textContent = formatEUR(extendedPerMonth);
+      document.getElementById('poExtendedDetail').textContent = '\u00d7' + extendedMonths + ' months \u2014 ' + formatEUR(extendedTotal) + ' total';
+      noteEl.textContent = 'Extended plan available for 6-month and full season programs. Contact us to discuss terms.';
+    } else {
+      extCard.style.display = 'none';
+      noteEl.textContent = 'All options cover the same services. Contact us to discuss which plan fits your situation.';
+    }
+  }
+
+  window.updateComparison = function() {
+    var sel = document.getElementById('usComparison').value;
+    initUSValues(sel);
+    buildCards();
+  };
+
+  // Init
+  initUSValues('private');
+  buildCards();
+  updateFinancing();
+})();
+</script>
+
+</body>
+</html>
