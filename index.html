@@ -567,33 +567,18 @@
     text-align: center;
   }
 
-  /* Funding Tips Section */
-  #itp-calculator .funding-section {
+  /* Financial Planner Section */
+  #itp-calculator .planner-callout {
     margin-bottom: 32px;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     overflow: hidden;
   }
-  #itp-calculator .funding-toggle {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-    padding: 14px 16px;
-    background: #f8fafc;
-    border: none;
-    cursor: pointer;
-    font-family: inherit;
-    text-align: left;
-  }
-  #itp-calculator .funding-toggle:hover {
-    background: #f1f5f9;
-  }
-  #itp-calculator .funding-badge {
+  #itp-calculator .planner-badge {
     display: inline-block;
     padding: 2px 8px;
-    background: #dcfce7;
-    color: #16a34a;
+    background: #f1f5f9;
+    color: #6b7280;
     font-size: 11px;
     font-weight: 600;
     border-radius: 4px;
@@ -601,58 +586,91 @@
     letter-spacing: 0.5px;
     flex-shrink: 0;
   }
-  #itp-calculator .funding-toggle-text {
-    font-size: 15px;
-    font-weight: 600;
-    color: #1a1a1a;
-    flex: 1;
-  }
-  #itp-calculator .funding-toggle .arrow {
-    display: inline-block;
-    transition: transform 0.2s ease;
-    font-size: 12px;
-    color: #9ca3af;
-    flex-shrink: 0;
-  }
-  #itp-calculator .funding-toggle .arrow.open {
-    transform: rotate(90deg);
-  }
-  #itp-calculator .funding-body {
+  #itp-calculator .planner-body {
     padding: 16px;
     display: none;
     border-top: 1px solid #e2e8f0;
   }
-  #itp-calculator .funding-cards {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
-    margin-bottom: 14px;
-  }
-  #itp-calculator .funding-card {
-    padding: 16px;
-    background: #f8fafc;
-    border-radius: 8px;
-    border: 1px solid #f1f5f9;
-  }
-  #itp-calculator .funding-card-icon {
-    font-size: 22px;
-    margin-bottom: 8px;
-    display: block;
-  }
-  #itp-calculator .funding-card h4 {
+  #itp-calculator .planner-intro {
     font-size: 14px;
-    font-weight: 600;
-    color: #1a1a1a;
-    margin-bottom: 6px;
+    color: #6b7280;
+    margin-bottom: 16px;
   }
-  #itp-calculator .funding-card p {
-    font-size: 13px;
+  #itp-calculator .planner-grid {
+    display: grid;
+    gap: 0;
+  }
+  #itp-calculator .planner-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  #itp-calculator .planner-row:last-child {
+    border-bottom: none;
+  }
+  #itp-calculator .planner-label {
+    font-size: 14px;
     color: #374151;
-    line-height: 1.5;
   }
-  #itp-calculator .funding-disclaimer {
+  #itp-calculator .planner-label-hint {
     font-size: 12px;
     color: #9ca3af;
+    display: block;
+  }
+  #itp-calculator .planner-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0 4px;
+    margin-top: 4px;
+    border-top: 2px solid #e2e8f0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+  #itp-calculator .planner-divider {
+    margin: 20px 0;
+    border: none;
+    border-top: 1px solid #e2e8f0;
+  }
+  #itp-calculator .planner-itp-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 12px;
+  }
+  #itp-calculator .planner-itp-price {
+    color: #ED1C24;
+  }
+  #itp-calculator .planner-plus-list {
+    list-style: none;
+    margin-bottom: 16px;
+  }
+  #itp-calculator .planner-plus-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 5px 0;
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.4;
+  }
+  #itp-calculator .planner-plus-list .check {
+    color: #059669;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  #itp-calculator .planner-quote {
+    font-size: 14px;
+    color: #374151;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-radius: 6px;
+    border-left: 3px solid #e2e8f0;
+    line-height: 1.5;
     font-style: italic;
   }
 
@@ -767,8 +785,12 @@
     #itp-calculator .credits-highlights {
       flex-direction: column;
     }
-    #itp-calculator .funding-cards {
-      grid-template-columns: 1fr;
+    #itp-calculator .planner-row {
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    #itp-calculator .planner-label {
+      flex-basis: 100%;
     }
   }
 </style>
@@ -876,6 +898,85 @@
 
     <div class="comparison-cards" id="comparisonCards"></div>
     <div class="comparison-nudge" id="comparisonNudge"></div>
+  </div>
+
+  <!-- Family Financial Planner -->
+  <div class="planner-callout" id="plannerCallout">
+    <button class="credits-toggle" onclick="togglePlanner()">
+      <span class="planner-badge">Plan</span>
+      <span class="credits-toggle-text">Plan Your Investment</span>
+      <span class="arrow" id="plannerArrow">&#9654;</span>
+    </button>
+    <div class="planner-body" id="plannerBody">
+      <p class="planner-intro">Enter what you currently spend on your athlete each year. See how it compares to the ITP &mdash; which replaces all of it and adds more.</p>
+
+      <div class="planner-grid">
+        <div class="planner-row">
+          <div class="planner-label">Club / Academy Fees<span class="planner-label-hint">Registration, dues, team fees</span></div>
+          <div class="comp-input-wrap">
+            <span class="comp-input-prefix">$</span>
+            <input type="number" class="comp-input planner-input" data-planner="club" value="4500" min="0" step="100">
+          </div>
+        </div>
+        <div class="planner-row">
+          <div class="planner-label">Private Coaching<span class="planner-label-hint">Additional training outside club</span></div>
+          <div class="comp-input-wrap">
+            <span class="comp-input-prefix">$</span>
+            <input type="number" class="comp-input planner-input" data-planner="coaching" value="3000" min="0" step="100">
+          </div>
+        </div>
+        <div class="planner-row">
+          <div class="planner-label">Travel &amp; Tournaments<span class="planner-label-hint">Hotels, gas, flights, entry fees</span></div>
+          <div class="comp-input-wrap">
+            <span class="comp-input-prefix">$</span>
+            <input type="number" class="comp-input planner-input" data-planner="travel" value="4000" min="0" step="100">
+          </div>
+        </div>
+        <div class="planner-row">
+          <div class="planner-label">Equipment &amp; Gear<span class="planner-label-hint">Boots, kits, bags</span></div>
+          <div class="comp-input-wrap">
+            <span class="comp-input-prefix">$</span>
+            <input type="number" class="comp-input planner-input" data-planner="gear" value="800" min="0" step="100">
+          </div>
+        </div>
+        <div class="planner-row">
+          <div class="planner-label">Food (~10 months)<span class="planner-label-hint">What you'd spend feeding your athlete</span></div>
+          <div class="comp-input-wrap">
+            <span class="comp-input-prefix">$</span>
+            <input type="number" class="comp-input planner-input" data-planner="food" value="5000" min="0" step="100">
+          </div>
+        </div>
+        <div class="planner-row">
+          <div class="planner-label">Gym / Fitness<span class="planner-label-hint">Memberships, S&amp;C training</span></div>
+          <div class="comp-input-wrap">
+            <span class="comp-input-prefix">$</span>
+            <input type="number" class="comp-input planner-input" data-planner="gym" value="600" min="0" step="100">
+          </div>
+        </div>
+      </div>
+
+      <div class="planner-total-row">
+        <span>Your annual total</span>
+        <span id="plannerTotal">$17,900</span>
+      </div>
+
+      <hr class="planner-divider">
+
+      <div class="planner-itp-label">ITP Full Season: <span class="planner-itp-price">44,000 EUR (~$47,000)</span></div>
+      <p class="planner-intro" style="margin-bottom:12px;">Includes everything above, <strong>plus:</strong></p>
+      <ul class="planner-plus-list">
+        <li><span class="check">&#10003;</span> Furnished apartment &amp; all utilities</li>
+        <li><span class="check">&#10003;</span> Health, accident &amp; liability insurance</li>
+        <li><span class="check">&#10003;</span> Bundesliga club registration &amp; UEFA coaching</li>
+        <li><span class="check">&#10003;</span> 5x/week pro training + 2&ndash;4 games/month</li>
+        <li><span class="check">&#10003;</span> Language school (2&ndash;3x/week)</li>
+        <li><span class="check">&#10003;</span> Video analysis &amp; performance reports</li>
+        <li><span class="check">&#10003;</span> Cultural experience in Europe</li>
+        <li><span class="check">&#10003;</span> Independence &amp; personal growth</li>
+      </ul>
+
+      <div class="planner-quote">The ITP isn't just a soccer program &mdash; it's a full year of professional training, education, and life experience in one of Europe's top football cities. Everything is included. There are no hidden costs.</div>
+    </div>
   </div>
 
   <!-- ASU Online Credits (Optional) -->
@@ -1309,9 +1410,9 @@
     }
   };
 
-  window.toggleFunding = function() {
-    var body = document.getElementById('fundingBody');
-    var arrow = document.getElementById('fundingArrow');
+  window.togglePlanner = function() {
+    var body = document.getElementById('plannerBody');
+    var arrow = document.getElementById('plannerArrow');
     if (body.style.display === 'none' || body.style.display === '') {
       body.style.display = 'block';
       arrow.classList.add('open');
@@ -1320,6 +1421,21 @@
       arrow.classList.remove('open');
     }
   };
+
+  function recalcPlannerTotal() {
+    var inputs = document.querySelectorAll('.planner-input');
+    var sum = 0;
+    for (var i = 0; i < inputs.length; i++) {
+      sum += parseInt(inputs[i].value) || 0;
+    }
+    document.getElementById('plannerTotal').textContent = '$' + sum.toLocaleString('en-US');
+  }
+
+  // Bind planner inputs
+  var plannerInputs = document.querySelectorAll('.planner-input');
+  for (var pi = 0; pi < plannerInputs.length; pi++) {
+    plannerInputs[pi].addEventListener('input', recalcPlannerTotal);
+  }
 
   var RESERVATION = 5000;
 
